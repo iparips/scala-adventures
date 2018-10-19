@@ -20,19 +20,19 @@ object CirceEncodingExercises {
     *
     */
 
-  def writeJsonString(value: String): String = ???
+  def writeJsonString(value: String): String = Json.fromString(value).noSpaces
 
   /** Exercise 2
     * Encode a simple boolean  Hint: use Json.fromBoolean method.
     */
-  def writeJsonBoolean(value: Boolean): String = ???
+  def writeJsonBoolean(value: Boolean): String = Json.fromBoolean(value).noSpaces
 
   /** Exercise 3
     * Encode an array of strings
     * This time use the Json.fromValues method, which takes a Iterable[Json]  (a List[_] is an Iterable[_]!)
     * Hint: use the methods explored above to convert the List[String] to List[Json].
     */
-  def writeJsonArray(values: List[String]): String = ???
+  def writeJsonArray(values: List[String]): String = Json.fromValues(values.map(Json.fromString)).noSpaces
 
   /** Exercise 4
     * Encode our first object
@@ -42,7 +42,12 @@ object CirceEncodingExercises {
     */
   case class Agent(surname: String, firstNames: List[String], principal: Boolean, agentId: Option[String] = None)
 
-  def writeAgent(agent: Agent): String = ???
+  def writeAgent(agent: Agent): String = {
+    val surname = ("surname", Json.fromString(agent.surname))
+    val firstNames = ("firstNames", Json.fromValues(agent.firstNames.map(Json.fromString)))
+    val principal = ("principal", Json.fromBoolean(agent.principal))
+    Json.obj(surname, firstNames, principal).noSpaces
+  }
 
   /** Introducing Encoders
     * This is getting a bit tedious.  Wouldn't it be nice if it could work out how to encode the field

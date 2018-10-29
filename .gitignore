@@ -27,5 +27,5 @@ tags
 .sbt
 .bash_history
 projectFilesBackup/*
-
+project
 

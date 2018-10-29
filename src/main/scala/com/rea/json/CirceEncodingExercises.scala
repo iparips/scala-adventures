@@ -66,7 +66,12 @@ object CirceEncodingExercises {
   /** Exercise 5
     * Rewrite agent encoding using the Encoder style
     */
-  def writeAgent2(agent: Agent): String = ???
+  def writeAgent2(agent: Agent): String = {
+    val surname = "surname" -> agent.surname.asJson
+    val firstNames = "firstNames" -> agent.firstNames.asJson
+    val principal = "principal" -> agent.principal.asJson
+    Json.obj(surname, firstNames, principal).noSpaces
+  }
 
   /**
     * But I have a field that is an Option ... I only want to write it if it exists!
@@ -90,9 +95,14 @@ object CirceEncodingExercises {
       "principal" -> agent.principal.asJson
     )
 
-    val optionalFields: List[(String, Json)] = ???
+    val optionalFields: List[(String, Json)] = {
+      agent.agentId match {
+        case Some(id) => List("agentid" -> id.asJson)
+        case None => List()
+      }
+    }
 
-    Json.obj( ??? ).noSpaces
+    Json.obj((mandatoryFields ++ optionalFields):_*).noSpaces
 
   }
 
@@ -113,7 +123,19 @@ object CirceEncodingExercises {
 
   val printer = Printer.noSpaces.copy(dropNullKeys = true)
 
-  def writeAgent5(agent: Agent): String = ???
+  def writeAgent5(agent: Agent): String = {
+    val fields: List[(String, Json)] = List(
+      "surname" -> agent.surname.asJson,
+      "firstNames" -> agent.firstNames.asJson,
+      "principal" -> agent.principal.asJson,
+      "agentid" -> agent.agentId.asJson
+    )
+
+    val printer = Printer.noSpaces.copy(dropNullKeys = true)
+
+    Json.obj(fields:_*).pretty(printer)
+
+  }
 
 
   /**
@@ -138,11 +160,20 @@ object CirceEncodingExercises {
 
 
   def writeProperty(property: Property): String = {
-    def encodeAgent(agent: Agent): Json = ???
+    def encodeAgent(agent: Agent): Json = {
+      val fields: List[(String, Json)] = List(
+        "surname" -> agent.surname.asJson,
+        "firstNames" -> agent.firstNames.asJson,
+        "principal" -> agent.principal.asJson,
+        "agentid" -> agent.agentId.asJson
+      )
+
+      Json.obj(fields:_*)
+    }
 
     Json.obj(
       "description" -> property.description.asJson,
-      "agent" -> ???
+      "agent" -> encodeAgent(property.agent)
     ).noSpaces
   }
 
@@ -169,6 +200,7 @@ object CirceEncodingExercises {
     */
 
   def writePropertyWithEncoder(property: Property): String = {
+
     def encodeAgent(agent: Agent): Json = ???
 
     /**
@@ -176,7 +208,14 @@ object CirceEncodingExercises {
       * that matches the abstract method's signature.  So the below line can be further simplified to:
       * implicit def AgentEncoder: Encoder[Agent] = encodeAgent
       */
-    implicit def AgentEncoder: Encoder[Agent] = ???
+    implicit def agentEncoder: Encoder[Agent] = new Encoder[Agent]{
+      final def apply(agent: Agent): Json = Json.obj(
+        "surname" -> agent.surname.asJson,
+        "firstNames" -> agent.firstNames.asJson,
+        "principal" -> agent.principal.asJson,
+        "agentid" -> agent.agentId.asJson
+      )
+    }
 
     Json.obj(
       "description" -> property.description.asJson,
